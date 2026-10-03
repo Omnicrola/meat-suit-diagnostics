@@ -25,3 +25,7 @@ android/.idea/
 Thumbs.db
 .vscode/
 .idea/
+android/keystore.properties
+android/app/release/
+android/.kotlin/
+android/captures/

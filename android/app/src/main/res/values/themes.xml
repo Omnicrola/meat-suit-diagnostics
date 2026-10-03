@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Only used before Compose draws; the app's look comes from MeatSuitTheme. -->
+    <style name="Theme.MeatSuit" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Sign in</h1>
+  {% if not configured %}
+  <p>Admin login isn't configured on this server. Set the <code>ADMIN_USERNAME</code> and
+     <code>ADMIN_PASSWORD_HASH</code> environment variables, then restart.</p>
+  <p class="muted">Generate the hash with <code>python -m app.cli hash-password</code>.</p>
+  {% else %}
+  <form method="post" action="/admin/login" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="next" value="{{ next or '' }}">
+    <label>Username
+      <input name="username" autocomplete="username" required autofocus value="{{ username or '' }}">
+    </label>
+    <label>Password
+      <input name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit">Sign in</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

@@ -33,7 +33,7 @@ def test_config_lists_questions_and_checkins(client, session, tired, headache):
 
 
 def test_editing_creates_new_version_and_config_shows_only_latest(client, session, tired):
-    services.update_question(session, tired.id, "How tired are you?", "scale", {"min": 0, "max": 5})
+    services.update_question(session, tired.id, "How tired are you?", {"min": 0, "max": 5})
     body = client.get("/api/v1/config").json()
 
     assert len(body["questions"]) == 1
@@ -58,7 +58,7 @@ def test_deleted_question_is_hidden_and_removed_from_checkins(client, session, t
 def test_deleted_question_cannot_be_edited_or_added(session, tired):
     services.delete_question(session, tired.id)
     with pytest.raises(services.NotFoundError):
-        services.update_question(session, tired.id, "x", "boolean", {})
+        services.update_question(session, tired.id, "x", {})
     with pytest.raises(services.NotFoundError):
         services.create_checkin(session, "Morning", "08:00", [1], [tired.id])
 
@@ -119,7 +119,7 @@ def test_etag_returns_304_until_config_changes(client, session, tired):
 
 
 def test_question_versions_endpoint(client, session, tired):
-    services.update_question(session, tired.id, "v2", "scale", {"min": 1, "max": 5})
+    services.update_question(session, tired.id, "v2", {"min": 1, "max": 5})
     services.delete_question(session, tired.id)
     versions = client.get(f"/api/v1/questions/{tired.id}/versions").json()
 

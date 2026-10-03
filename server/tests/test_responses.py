@@ -122,7 +122,7 @@ def test_skipped_and_missed_have_null_value(client, tired):
 
 def test_answers_to_old_and_deleted_versions_are_accepted(client, session, tired):
     v1 = make(tired, 9)  # answered against version 1, range 1-10
-    services.update_question(session, tired.id, "Tired?", "scale", {"min": 1, "max": 5})
+    services.update_question(session, tired.id, "Tired?", {"min": 1, "max": 5})
     services.delete_question(session, tired.id)
 
     result = upload(client, v1)

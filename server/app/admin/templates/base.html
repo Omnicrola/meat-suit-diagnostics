@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>{% block title %}Admin{% endblock %} · Meat Suit Diagnostics</title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+  <script src="/admin/static/admin.js" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/admin">Meat Suit Diagnostics</a>
+    {% if user %}
+    <nav aria-label="Main">
+      <a href="/admin/questions" {% if section == "questions" %}aria-current="page"{% endif %}>Questions</a>
+      <a href="/admin/checkins" {% if section == "checkins" %}aria-current="page"{% endif %}>Check-ins</a>
+      <a href="/admin/api-key" {% if section == "api_key" %}aria-current="page"{% endif %}>API key</a>
+      <a href="/admin/backup" {% if section == "backup" %}aria-current="page"{% endif %}>Backup</a>
+    </nav>
+    <form method="post" action="/admin/logout" class="signout">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="link">Sign out</button>
+    </form>
+    {% endif %}
+  </header>
+  <main>
+    {% for f in flashes %}
+    <div class="flash flash-{{ f.kind }}" role="status">{{ f.message }}</div>
+    {% endfor %}
+    {% if error %}
+    <div class="flash flash-error" role="alert">{{ error }}</div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

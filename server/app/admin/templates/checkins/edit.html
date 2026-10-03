@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{% if checkin %}{{ checkin.name }}{% else %}New check-in{% endif %}{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="/admin/checkins">← Check-ins</a></p>
+<h1>{% if checkin %}Edit check-in{% else %}New check-in{% endif %}</h1>
+
+<form method="post" class="card stack"
+      action="{% if checkin %}/admin/checkins/{{ checkin.id }}{% else %}/admin/checkins/new{% endif %}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <label>Name
+    <input name="name" required maxlength="100" value="{{ values.name }}" placeholder="Evening">
+  </label>
+
+  <div class="grid">
+    <label>Time (phone's local time)
+      <input name="time_local" type="time" required value="{{ values.time_local }}">
+    </label>
+    <label>Expires after (minutes)
+      <input name="expires_after_minutes" type="number" min="1" max="1440" required value="{{ values.expires_after_minutes }}">
+      <span class="hint">Unanswered questions are then recorded as missed.</span>
+    </label>
+  </div>
+
+  <fieldset>
+    <legend>Days</legend>
+    <div class="days">
+      {% for name in day_names %}
+      <label class="check">
+        <input type="checkbox" name="days_of_week" value="{{ loop.index }}" {% if loop.index in values.days_of_week %}checked{% endif %}>
+        {{ name }}
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <fieldset id="checkin-questions">
+    <legend>Questions, in the order they're asked</legend>
+    <ol class="ordered">
+      {% for q in selected %}
+      <li>
+        <input type="hidden" name="question_ids" value="{{ q.id }}">
+        <span class="grow">{{ q.text }}</span>
+        <button type="button" class="icon" data-move="up" aria-label="Move up" title="Move up">↑</button>
+        <button type="button" class="icon" data-move="down" aria-label="Move down" title="Move down">↓</button>
+        <button type="button" class="icon" data-move="remove" aria-label="Remove" title="Remove">×</button>
+      </li>
+      {% endfor %}
+    </ol>
+    <template id="checkin-item">
+      <li>
+        <input type="hidden" name="question_ids" value="">
+        <span class="grow"></span>
+        <button type="button" class="icon" data-move="up" aria-label="Move up" title="Move up">↑</button>
+        <button type="button" class="icon" data-move="down" aria-label="Move down" title="Move down">↓</button>
+        <button type="button" class="icon" data-move="remove" aria-label="Remove" title="Remove">×</button>
+      </li>
+    </template>
+    {% if questions %}
+    <div class="inline">
+      <select aria-label="Question to add">
+        <option value="">Add a question…</option>
+        {% for q in questions %}<option value="{{ q.id }}">{{ q.text }}</option>{% endfor %}
+      </select>
+      <button type="button" class="secondary" data-action="add">Add</button>
+    </div>
+    {% else %}
+    <p class="muted">No questions exist yet. <a href="/admin/questions/new">Create one first.</a></p>
+    {% endif %}
+  </fieldset>
+
+  <label class="check">
+    <input type="checkbox" name="enabled" {% if values.enabled %}checked{% endif %}>
+    Enabled (disabled check-ins aren't sent to the phone)
+  </label>
+
+  <div class="actions">
+    <button type="submit">{% if checkin %}Save{% else %}Create check-in{% endif %}</button>
+    <a href="/admin/checkins">Cancel</a>
+  </div>
+</form>
+
+{% if checkin %}
+<section class="danger-zone">
+  <h2>Delete</h2>
+  <form method="post" action="/admin/checkins/{{ checkin.id }}/delete"
+        data-confirm="Delete this check-in? Past answers are kept.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="danger">Delete check-in</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

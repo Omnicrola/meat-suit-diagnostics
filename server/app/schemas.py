@@ -1,7 +1,7 @@
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from app.question_types import QuestionType
 from app.timeutil import UtcTimestamp
@@ -9,6 +9,17 @@ from app.timeutil import UtcTimestamp
 ResponseStatus = Literal["answered", "skipped", "missed"]
 
 MAX_UPLOAD_BATCH = 500
+
+
+def describe_error(e: Exception) -> str:
+    """A compact, human-readable message for a pydantic ValidationError or plain ValueError."""
+    if isinstance(e, ValidationError):
+        return "; ".join(
+            f"{'.'.join(str(p) for p in err['loc']) or 'value'}: {err['msg'].removeprefix('Value error, ')}"
+            if err["loc"] else err["msg"].removeprefix("Value error, ")
+            for err in e.errors()
+        )
+    return str(e)
 
 
 class CheckinInput(BaseModel):

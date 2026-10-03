@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Backup{% endblock %}
+{% block content %}
+<h1>Backup</h1>
+<section class="card stack">
+  <dl class="facts">
+    <dt>Database size</dt><dd>{{ "%.1f" | format(stats.size_bytes / 1024) }} KB</dd>
+    <dt>Questions</dt><dd>{{ stats.questions }}</dd>
+    <dt>Check-ins</dt><dd>{{ stats.checkins }}</dd>
+    <dt>Answers</dt><dd>{{ stats.responses }}</dd>
+    <dt>Latest answer</dt><dd>{{ stats.latest | utc }}</dd>
+  </dl>
+  <p>Downloads a complete copy of the SQLite database. It's safe to do while the phone is syncing.</p>
+  <p><a class="button" href="/admin/backup/download">Download database</a></p>
+</section>
+{% endblock %}

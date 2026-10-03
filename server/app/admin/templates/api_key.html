@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}API key{% endblock %}
+{% block content %}
+<h1>API key</h1>
+
+{% if new_key %}
+<section class="card stack">
+  <h2>Scan this with the phone</h2>
+  <p><strong>This key is shown only once.</strong> Leaving this page hides it for good;
+     if you lose it, generate a new one.</p>
+  <div class="qr">{{ qr_svg | safe }}</div>
+  <dl class="facts">
+    <dt>Server URL</dt><dd><code>{{ server_url }}</code></dd>
+    <dt>API key</dt><dd><code class="secret">{{ new_key }}</code></dd>
+  </dl>
+  {% if not server_url.startswith("https://") %}
+  <p class="flash flash-error">This server URL isn't HTTPS, and the phone app only connects over HTTPS.
+     Set <code>PUBLIC_URL</code> or open this page through the HTTPS address.</p>
+  {% endif %}
+  <p><a class="button" href="/admin/api-key">Done</a></p>
+</section>
+{% else %}
+<section class="card stack">
+  {% if active %}
+  <dl class="facts">
+    <dt>Status</dt><dd>Active</dd>
+    <dt>Key</dt><dd><code>{{ active.prefix }}…</code></dd>
+    <dt>Created</dt><dd>{{ active.created_at | utc }}</dd>
+    <dt>Last used</dt><dd>{{ active.last_used_at | utc }}</dd>
+  </dl>
+  <div class="actions">
+    <form method="post" action="/admin/api-key/generate"
+          data-confirm="Generate a new key? The current key stops working immediately and the phone must re-scan.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit">Generate new key</button>
+    </form>
+    <form method="post" action="/admin/api-key/revoke"
+          data-confirm="Revoke the key? The phone can't sync until you generate a new one.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="danger">Revoke</button>
+    </form>
+  </div>
+  {% else %}
+  <p>There's no active key, so the phone can't sync. Generate one, then scan the QR code in the app.</p>
+  <form method="post" action="/admin/api-key/generate">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Generate key</button>
+  </form>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

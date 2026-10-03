@@ -26,6 +26,7 @@ from app.schemas import (
     ResponseOut,
     UploadIn,
     UploadResult,
+    describe_error,
 )
 from app.security import require_api_key
 from app.timeutil import format_utc, utcnow
@@ -81,7 +82,7 @@ def upload_responses(body: UploadIn, session: SessionDep):
         try:
             item = ResponseIn.model_validate(raw)
         except ValidationError as e:
-            result.rejected.append(Rejected(id=client_id, error=_format_validation_error(e)))
+            result.rejected.append(Rejected(id=client_id, error=describe_error(e)))
             continue
 
         rid = str(item.id)
@@ -157,11 +158,6 @@ def _check_references_and_value(session, item: ResponseIn) -> str | None:
             return f"value: {e}"
     return None
 
-
-def _format_validation_error(e: ValidationError) -> str:
-    return "; ".join(
-        f"{'.'.join(str(p) for p in err['loc']) or 'response'}: {err['msg']}" for err in e.errors()
-    )
 
 
 _CSV_COLUMNS = [

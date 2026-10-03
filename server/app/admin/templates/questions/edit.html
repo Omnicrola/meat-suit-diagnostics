@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}{% if question %}Question {{ question.id }}{% else %}New question{% endif %}{% endblock %}
+{% block head %}<script src="/admin/static/question_editor.js" defer></script>{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="/admin/questions">← Questions</a></p>
+
+{% if question and question.deleted %}
+<h1>Question {{ question.id }} <span class="badge">deleted</span></h1>
+<p>This question was deleted. It's no longer sent to the phone, but its past answers are kept.</p>
+{% else %}
+<h1>{% if question %}Edit question {{ question.id }}{% else %}New question{% endif %}</h1>
+{% if question %}
+<p class="muted">Current version: {{ question.version }}. Saving changes creates version {{ question.version + 1 }};
+  answers already given keep pointing at the version they answered.</p>
+{% endif %}
+
+<form method="post" id="question-form" class="card stack"
+      action="{% if question %}/admin/questions/{{ question.id }}{% else %}/admin/questions/new{% endif %}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="config_json" value="">
+  <script type="application/json" id="question-data">{{ {"type": qtype, "config": config} | tojson }}</script>
+
+  <label>Question text
+    <input name="text" required maxlength="500" value="{{ text }}" placeholder="How tired do you feel?">
+  </label>
+
+  <label>Answer type
+    {% if question %}
+    <select name="type" disabled>
+      <option value="{{ qtype }}" selected>{{ type_labels[qtype] }}</option>
+    </select>
+    <span class="hint">The answer type can't change, so that every answer to a question is comparable.
+      Create a new question for a different kind of answer.</span>
+    {% else %}
+    <select name="type">
+      {% for key, label in type_labels.items() %}
+      <option value="{{ key }}" {% if key == qtype %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+  </label>
+
+  <fieldset>
+    <legend>Answer settings</legend>
+    <div id="config-editor"><p class="muted">Loading…</p></div>
+  </fieldset>
+
+  <div class="actions">
+    <button type="submit">{% if question %}Save as version {{ question.version + 1 }}{% else %}Create question{% endif %}</button>
+    <a href="/admin/questions">Cancel</a>
+  </div>
+</form>
+
+{% if question %}
+<section class="danger-zone">
+  <h2>Delete</h2>
+  {% if used_in %}
+  <p>Deleting also removes it from: {{ used_in | join(", ") }}.</p>
+  {% endif %}
+  <form method="post" action="/admin/questions/{{ question.id }}/delete"
+        data-confirm="Delete this question? It stops being asked; past answers are kept.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="danger">Delete question</button>
+  </form>
+</section>
+{% endif %}
+{% endif %}
+
+{% if versions %}
+<section>
+  <h2>Version history</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th class="num">Version</th><th>Text</th><th>Settings</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for v in versions %}
+      <tr {% if v.deleted %}class="deleted"{% endif %}>
+        <td class="num">{{ v.version }}</td>
+        <td>{% if v.deleted %}<span class="badge">deleted</span>{% else %}{{ v.text }}{% endif %}</td>
+        <td><code class="config">{{ v.config | tojson }}</code></td>
+        <td class="nowrap">{{ v.created_at | utc }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

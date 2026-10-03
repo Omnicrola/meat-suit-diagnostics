@@ -8,7 +8,7 @@ A single-user system for recording health check-ins on an Android phone (Samsung
 |---|---|---|
 | Android app | Kotlin, Jetpack Compose, Room, DataStore, Retrofit/OkHttp, kotlinx.serialization, WorkManager, AlarmManager | Fetches config, fires check-in notifications, collects answers, queues answers offline and syncs them |
 | API server | Python 3.13, FastAPI, SQLAlchemy 2 + Alembic, SQLite (WAL mode), Uvicorn (single worker) | JSON API for the phone |
-| Admin web app | Jinja2 templates + HTMX, served by the same FastAPI process | Manage questions, check-ins and the API key; download backups |
+| Admin web app | Jinja2 templates + a little vanilla JS (no CDN), served by the same FastAPI process | Manage questions, check-ins and the API key; download backups |
 | Hosting | Railway service + Railway Volume mounted at `/data` | HTTPS is provided by Railway; the DB file lives on the volume |
 
 Repository layout (monorepo):
@@ -170,7 +170,7 @@ Filters on `answered_at` (`from` inclusive, `to` exclusive). Sorted ascending. C
 | Page | Function |
 |---|---|
 | Login / logout | |
-| Questions | List, create, edit, soft-delete. Type-specific config form with a live preview of the question |
+| Questions | List, create, edit (new version; type is fixed), soft-delete. Type-specific settings form. Version history |
 | Check-ins | List, create, edit, soft-delete, enable/disable. Name, time, day checkboxes, expiry window, ordered question picker |
 | API key | Generate (shows the key and QR code once), revoke, last-used info |
 | Backup | **Download database** button. Uses SQLite's online backup API to make a consistent snapshot, then streams `meatsuit-YYYYMMDD-HHMMSS.db` |
@@ -222,7 +222,7 @@ Any change to questions or check-ins increments `config_version`.
 
 - Builds from `server/` with a Dockerfile. Start command: `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 - Volume mounted at `/data`, with `DATABASE_PATH=/data/meatsuit.db`.
-- Env vars: `DATABASE_PATH`, `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`.
+- Env vars: `DATABASE_PATH`, `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `PUBLIC_URL` (see `server/README.md`).
 - Health check path: `/healthz`.
 - HTTPS on the `*.up.railway.app` domain, or optionally a custom domain.
 - Exactly one replica, which SQLite requires.

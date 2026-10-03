@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Questions{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Questions</h1>
+  <a class="button" href="/admin/questions/new">New question</a>
+</div>
+
+<p class="muted">
+  {% if show_deleted %}
+  Showing deleted questions too. <a href="/admin/questions">Hide deleted</a>
+  {% else %}
+  <a href="/admin/questions?deleted=true">Show deleted</a>
+  {% endif %}
+</p>
+
+{% if questions %}
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th class="num">ID</th><th>Question</th><th>Type</th><th class="num">Version</th><th>Used in</th><th>Last changed</th></tr>
+  </thead>
+  <tbody>
+  {% for q in questions %}
+    <tr {% if q.deleted %}class="deleted"{% endif %}>
+      <td class="num">{{ q.id }}</td>
+      <td><a href="/admin/questions/{{ q.id }}">{{ q.text }}</a>{% if q.deleted %} <span class="badge">deleted</span>{% endif %}</td>
+      <td>{{ type_labels[q.type] }}</td>
+      <td class="num">{{ q.version }}</td>
+      <td>{{ used_in.get(q.id, []) | join(", ") or "—" }}</td>
+      <td class="nowrap">{{ q.created_at | utc }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<div class="empty">
+  <p>No questions yet.</p>
+  <a class="button" href="/admin/questions/new">Create the first question</a>
+</div>
+{% endif %}
+{% endblock %}

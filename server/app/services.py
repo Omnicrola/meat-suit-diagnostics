@@ -84,13 +84,17 @@ def create_question(session: Session, text: str, qtype: str, config: dict[str, A
     return question
 
 
-def update_question(
-    session: Session, question_id: int, text: str, qtype: str, config: dict[str, Any]
-) -> Question:
+def update_question(session: Session, question_id: int, text: str, config: dict[str, Any]) -> Question:
+    """Add a new version with new text and/or config. The type can't change: answers to every version
+    of a question should be comparable, so a different kind of answer needs a new question.
+    Returns the current version unchanged if nothing differs."""
     current = _get_live_question(session, question_id)
-    config = validate_config(qtype, config)
+    text = _require_text(text)
+    config = validate_config(current.type, config)
+    if text == current.text and config == current.config:
+        return current
     question = Question(
-        id=question_id, version=current.version + 1, text=_require_text(text), type=qtype,
+        id=question_id, version=current.version + 1, text=text, type=current.type,
         config=config, deleted=False, created_at=utcnow(),
     )
     session.add(question)

@@ -1,10 +1,15 @@
-# Only server/ goes into the image; keep the build context small.
-*
-!server/pyproject.toml
-!server/app/
-!server/alembic.ini
-!server/migrations/
+# Keep the build context small: the image only needs server/ (see Dockerfile).
+.git/
+.claude/
+android/
+docs/
+server/.venv/
+server/tests/
+server/scripts/
 **/__pycache__/
+**/.pytest_cache/
+**/*.egg-info/
 **/*.db
 **/*.db-wal
 **/*.db-shm
+**/.env

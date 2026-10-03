@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+
+# Local data / secrets
+*.db
+*.db-wal
+*.db-shm
+.env
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.jks
+*.keystore
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

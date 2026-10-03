@@ -1,0 +1,28 @@
+[project]
+name = "meatsuit-diagnostics-server"
+version = "0.1.0"
+description = "API and admin web app for Meat Suit Diagnostics"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.142,<1",
+    "uvicorn[standard]>=0.54,<1",
+    "sqlalchemy>=2.1,<3",
+    "alembic>=1.20,<2",
+    "pydantic>=2.13,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9",
+    "httpx2>=2.13",
+]
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

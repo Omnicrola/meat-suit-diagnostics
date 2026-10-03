@@ -4,13 +4,24 @@ A Kotlin and Jetpack Compose app for Android 13+ (built for a Samsung Galaxy A14
 
 ## Build
 
-Open the `android/` folder in Android Studio (current version, which bundles JDK 21) and let it sync. Or from a terminal:
+Open the `android/` folder in Android Studio and let it sync. Or from a terminal, with `JAVA_HOME` set to Android Studio's bundled JDK (`C:\Program Files\Android\Android Studio\jbr`):
 
 ```bash
 ./gradlew testDebugUnitTest      # unit tests (domain logic)
 ./gradlew assembleDebug          # app/build/outputs/apk/debug/app-debug.apk
 ./gradlew assembleRelease        # needs keystore.properties, see below
 ```
+
+## Testing against a local server (emulator)
+
+Debug builds may use plain HTTP to `10.0.2.2`, which is the development machine as seen from the emulator. Release builds are HTTPS-only.
+
+1. Start the server with `server/scripts/dev_server.py` and issue a key with `python -m app.cli new-api-key` (`DATABASE_PATH=dev.db`).
+2. Install the debug APK on the emulator and open the setup link:
+   ```bash
+   adb shell "am start -a android.intent.action.VIEW -d 'meatsuit://setup?url=http%3A%2F%2F10.0.2.2%3A8000&key=<key>'"
+   ```
+3. To test reminders, create a check-in a few minutes ahead in the admin app (http://localhost:8000/admin), then tap **Sync now** in the app's settings. `adb shell dumpsys alarm | grep meatsuit` lists the pending alarms.
 
 ## Release signing
 

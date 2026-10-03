@@ -7,8 +7,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import com.meatsuitdiagnostics.app.MainActivity
 import com.meatsuitdiagnostics.app.R
 import com.meatsuitdiagnostics.app.data.db.InstanceEntity
@@ -57,7 +57,7 @@ class Notifier(private val context: Context) {
     private fun snoozeIntent(instanceId: String, minutes: Long): PendingIntent {
         val intent = Intent(context, AlarmReceiver::class.java)
             .setAction(AlarmReceiver.ACTION_SNOOZE)
-            .setData(Uri.parse("meatsuit-alarm://snooze/$instanceId/$minutes"))
+            .setData("meatsuit-alarm://snooze/$instanceId/$minutes".toUri())
             .putExtra(AlarmReceiver.EXTRA_INSTANCE_ID, instanceId)
             .putExtra(AlarmReceiver.EXTRA_MINUTES, minutes)
         return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)

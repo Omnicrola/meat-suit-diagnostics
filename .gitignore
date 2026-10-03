@@ -29,3 +29,4 @@ android/keystore.properties
 android/app/release/
 android/.kotlin/
 android/captures/
+.claude/dev-api-key.txt

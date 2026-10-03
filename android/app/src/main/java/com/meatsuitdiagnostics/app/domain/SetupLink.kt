@@ -9,7 +9,14 @@ data class SetupLink(val serverUrl: String, val apiKey: String) {
     val serverHost: String get() = URI(serverUrl).host
 
     companion object {
-        fun parse(raw: String): SetupLink? {
+        /** The development machine as seen from the Android emulator. */
+        const val EMULATOR_HOST = "10.0.2.2"
+
+        /**
+         * Parses a setup link. The server must use HTTPS, except that [allowHttpToEmulatorHost] (debug builds only)
+         * permits plain HTTP to [EMULATOR_HOST] for testing against a local server.
+         */
+        fun parse(raw: String, allowHttpToEmulatorHost: Boolean = false): SetupLink? {
             val uri = runCatching { URI(raw.trim()) }.getOrNull() ?: return null
             if (uri.scheme != "meatsuit" || uri.host != "setup") return null
             val params = (uri.rawQuery ?: return null).split("&").mapNotNull { part ->
@@ -20,7 +27,10 @@ data class SetupLink(val serverUrl: String, val apiKey: String) {
             val url = params["url"]?.trimEnd('/') ?: return null
             val key = params["key"] ?: return null
             val server = runCatching { URI(url) }.getOrNull() ?: return null
-            if (server.scheme != "https" || server.host.isNullOrEmpty()) return null
+            if (server.host.isNullOrEmpty()) return null
+            val secure = server.scheme == "https"
+            val emulatorDev = allowHttpToEmulatorHost && server.scheme == "http" && server.host == EMULATOR_HOST
+            if (!secure && !emulatorDev) return null
             if (!key.startsWith("msd_") || key.length < 20) return null
             return SetupLink(url, key)
         }

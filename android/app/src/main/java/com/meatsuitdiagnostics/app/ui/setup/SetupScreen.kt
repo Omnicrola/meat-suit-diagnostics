@@ -35,6 +35,7 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.meatsuitdiagnostics.app.AppContainer
+import com.meatsuitdiagnostics.app.BuildConfig
 import com.meatsuitdiagnostics.app.data.api.AuthException
 import com.meatsuitdiagnostics.app.data.api.ConfigResult
 import com.meatsuitdiagnostics.app.data.settings.Credentials
@@ -70,7 +71,7 @@ class SetupViewModel(private val container: AppContainer) : ViewModel() {
     }
 
     fun onScanned(raw: String?) {
-        val link = raw?.let(SetupLink::parse)
+        val link = raw?.let { SetupLink.parse(it, BuildConfig.DEBUG) }
         state = if (link == null) {
             SetupState.Scan(error = "That QR code isn't a Meat Suit Diagnostics setup code.")
         } else {

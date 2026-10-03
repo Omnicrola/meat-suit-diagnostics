@@ -1,9 +1,7 @@
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -17,7 +15,7 @@ val keystoreProperties = Properties().apply {
 
 android {
     namespace = "com.meatsuitdiagnostics.app"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.meatsuitdiagnostics.app"
@@ -56,11 +54,6 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
 
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")

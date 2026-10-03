@@ -53,7 +53,7 @@ class ApiClient(private val http: OkHttpClient, private val json: Json) {
     private fun Response.bodyOrThrow(): String {
         if (code == 401) throw AuthException()
         if (!isSuccessful) throw IOException("Server returned HTTP $code")
-        return body?.string() ?: throw IOException("Empty response from server")
+        return body.string()
     }
 
     private companion object {

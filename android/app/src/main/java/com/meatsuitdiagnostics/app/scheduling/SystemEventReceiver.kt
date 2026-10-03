@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 class SystemEventReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action !in HANDLED_ACTIONS) return
         val container = (context.applicationContext as MeatSuitApp).container
         val pending = goAsync()
         container.appScope.launch {
@@ -24,5 +25,14 @@ class SystemEventReceiver : BroadcastReceiver() {
                 pending.finish()
             }
         }
+    }
+
+    private companion object {
+        val HANDLED_ACTIONS = setOf(
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_MY_PACKAGE_REPLACED,
+            Intent.ACTION_TIMEZONE_CHANGED,
+            Intent.ACTION_TIME_CHANGED, // "android.intent.action.TIME_SET"
+        )
     }
 }

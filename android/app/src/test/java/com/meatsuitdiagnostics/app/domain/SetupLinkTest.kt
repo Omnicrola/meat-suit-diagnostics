@@ -26,6 +26,14 @@ class SetupLinkTest {
     }
 
     @Test
+    fun httpToEmulatorHostOnlyWhenAllowed() {
+        val raw = "meatsuit://setup?url=http%3A%2F%2F10.0.2.2%3A8000&key=$key"
+        assertNull(SetupLink.parse(raw))
+        assertEquals("http://10.0.2.2:8000", SetupLink.parse(raw, allowHttpToEmulatorHost = true)?.serverUrl)
+        assertNull(SetupLink.parse("meatsuit://setup?url=http%3A%2F%2Fexample.com&key=$key", allowHttpToEmulatorHost = true))
+    }
+
+    @Test
     fun rejectsOtherLinks() {
         assertNull(SetupLink.parse("https://example.com"))
         assertNull(SetupLink.parse("meatsuit://other?url=https%3A%2F%2Fexample.com&key=$key"))

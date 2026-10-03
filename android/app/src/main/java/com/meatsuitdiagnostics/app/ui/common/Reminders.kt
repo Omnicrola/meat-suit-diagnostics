@@ -1,11 +1,11 @@
 package com.meatsuitdiagnostics.app.ui.common
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
 
 /** Whether the phone is set up to deliver reminders on time. */
@@ -61,6 +62,7 @@ fun rememberReminderReadiness(): ReminderReadiness {
     return readiness
 }
 
+@SuppressLint("BatteryLife") // Sideloaded, so Play's restriction on this request doesn't apply.
 @Composable
 fun ReminderChecklist(readiness: ReminderReadiness, modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -84,7 +86,7 @@ fun ReminderChecklist(readiness: ReminderReadiness, modifier: Modifier = Modifie
             actionLabel = "Open settings",
             onAction = {
                 context.startActivity(
-                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
+                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, "package:${context.packageName}".toUri())
                 )
             },
         )
@@ -95,7 +97,7 @@ fun ReminderChecklist(readiness: ReminderReadiness, modifier: Modifier = Modifie
             actionLabel = "Allow",
             onAction = {
                 context.startActivity(
-                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}"))
+                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, "package:${context.packageName}".toUri())
                 )
             },
         )
@@ -135,4 +137,4 @@ private fun appNotificationSettings(context: Context) =
     Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
 
 private fun appDetailsSettings(context: Context) =
-    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))
+    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:${context.packageName}".toUri())

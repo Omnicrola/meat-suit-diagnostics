@@ -1,10 +1,11 @@
 package com.meatsuitdiagnostics.app.scheduling
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import com.meatsuitdiagnostics.app.data.db.CheckinEntity
 import com.meatsuitdiagnostics.app.domain.Schedule
 import java.time.Instant
@@ -36,6 +37,7 @@ class AlarmScheduler(private val context: Context) {
         alarms.cancel(instancePending(AlarmReceiver.ACTION_EXPIRE, instanceId))
     }
 
+    @SuppressLint("MissingPermission") // USE_EXACT_ALARM is declared; the call is also guarded below.
     private fun setExact(at: Instant, pending: PendingIntent) {
         // USE_EXACT_ALARM is granted at install, so this is normally true; fall back to inexact just in case.
         if (alarms.canScheduleExactAlarms()) {
@@ -48,7 +50,7 @@ class AlarmScheduler(private val context: Context) {
     private fun firePending(checkinId: Int, at: Instant): PendingIntent {
         val intent = Intent(context, AlarmReceiver::class.java)
             .setAction(AlarmReceiver.ACTION_FIRE)
-            .setData(Uri.parse("meatsuit-alarm://fire/$checkinId"))
+            .setData("meatsuit-alarm://fire/$checkinId".toUri())
             .putExtra(AlarmReceiver.EXTRA_CHECKIN_ID, checkinId)
             .putExtra(AlarmReceiver.EXTRA_SCHEDULED_FOR, at.toEpochMilli())
         return PendingIntent.getBroadcast(context, 0, intent, FLAGS)
@@ -57,7 +59,7 @@ class AlarmScheduler(private val context: Context) {
     private fun instancePending(action: String, instanceId: String): PendingIntent {
         val intent = Intent(context, AlarmReceiver::class.java)
             .setAction(action)
-            .setData(Uri.parse("meatsuit-alarm://${action.substringAfterLast('.')}/$instanceId"))
+            .setData("meatsuit-alarm://${action.substringAfterLast('.')}/$instanceId".toUri())
             .putExtra(AlarmReceiver.EXTRA_INSTANCE_ID, instanceId)
         return PendingIntent.getBroadcast(context, 0, intent, FLAGS)
     }

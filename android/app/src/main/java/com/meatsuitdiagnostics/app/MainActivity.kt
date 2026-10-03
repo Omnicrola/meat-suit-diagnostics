@@ -2,11 +2,11 @@ package com.meatsuitdiagnostics.app
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.meatsuitdiagnostics.app.domain.SetupLink
 import com.meatsuitdiagnostics.app.ui.AppLink
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
             ACTION_OPEN_CHECKIN -> intent.getStringExtra(EXTRA_INSTANCE_ID)?.let { links.value = AppLink.OpenCheckin(it) }
             Intent.ACTION_VIEW -> {
                 // Never applied directly: the setup screen shows the server and asks before connecting.
-                container.pendingSetupLink.value = intent.dataString?.let(SetupLink::parse)
+                container.pendingSetupLink.value = intent.dataString?.let { SetupLink.parse(it, BuildConfig.DEBUG) }
                 links.value = AppLink.Setup
             }
         }
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
         fun openCheckinIntent(context: Context, instanceId: String): Intent =
             Intent(context, MainActivity::class.java)
                 .setAction(ACTION_OPEN_CHECKIN)
-                .setData(Uri.parse("meatsuit-app://checkin/$instanceId"))
+                .setData("meatsuit-app://checkin/$instanceId".toUri())
                 .putExtra(EXTRA_INSTANCE_ID, instanceId)
     }
 }

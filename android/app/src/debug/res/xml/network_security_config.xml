@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: also allow plain HTTP to the development machine as seen from the emulator
+     (10.0.2.2), for testing against server/scripts/dev_server.py. Release builds use src/main's HTTPS-only config. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>

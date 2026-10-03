@@ -1,0 +1,10 @@
+# Only server/ goes into the image; keep the build context small.
+*
+!server/pyproject.toml
+!server/app/
+!server/alembic.ini
+!server/migrations/
+**/__pycache__/
+**/*.db
+**/*.db-wal
+**/*.db-shm

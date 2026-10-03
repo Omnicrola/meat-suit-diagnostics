@@ -220,7 +220,7 @@ Any change to questions or check-ins increments `config_version`.
 
 ## 9. Deployment (Railway)
 
-- Builds from `server/` with a Dockerfile. Start command: `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+- Built from the repo-root `Dockerfile` (which copies only `server/`) using the repo-root `railway.json`, so no Root Directory setting is needed. Only changes under `server/` trigger a redeploy. On start the container runs `alembic upgrade head`, then Uvicorn on `$PORT`.
 - Volume mounted at `/data`, with `DATABASE_PATH=/data/meatsuit.db`.
 - Env vars: `DATABASE_PATH`, `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `PUBLIC_URL` (see `server/README.md`).
 - Health check path: `/healthz`.
